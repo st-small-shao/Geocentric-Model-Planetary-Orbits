@@ -1,0 +1,35 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from astropy.time import Time
+from astropy.coordinates import solar_system_ephemeris, get_body
+
+# 设置日期范围
+start_date = Time("2000-01-01")
+end_date = Time("2020-12-31")
+dates = np.linspace(start_date.jd, end_date.jd, 1000)
+times = Time(dates, format='jd')
+
+# 设置天体轨道计算方法为“builtin”
+solar_system_ephemeris.set("builtin")
+
+# 获取六大行星、太阳和月球的轨道参数
+bodies = ['mercury', 'venus', 'earth', 'mars', 'jupiter', 'saturn', 'sun', 'moon']
+orbital_elements = {}
+for body in bodies:
+    body_data = get_body(body, times)
+    orbital_elements[body] = body_data
+
+# 绘制轨道
+fig, ax = plt.subplots(figsize=(10, 6))
+for body in bodies:
+    orbit = orbital_elements[body]
+    x = orbit.cartesian.x
+    y = orbit.cartesian.y
+    ax.plot(x, y, label=body.capitalize())
+
+ax.set_aspect('equal', 'box')
+ax.set_xlabel('X (AU)')
+ax.set_ylabel('Y (AU)')
+ax.set_title('Geocentric Model - Planetary Orbits')
+ax.legend()
+plt.show()
